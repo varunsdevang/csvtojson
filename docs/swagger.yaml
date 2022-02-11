@@ -1,0 +1,47 @@
+basePath: /api/v1
+definitions:
+  controller.ErrorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+host: localhost
+info:
+  contact:
+    email: varundevang@gmail.com
+    name: T S Varun
+    url: https://www.linkedin.com/in/tsvarun/
+  description: a simple REST serverto convert csv file to json.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: CSV to JSON
+  version: "1.0"
+paths:
+  /csvtojson:
+    post:
+      consumes:
+      - multipart/form-data
+      description: generates json array for provided csv file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties:
+                type: string
+              type: object
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: handler for csv to json conversion
+swagger: "2.0"
