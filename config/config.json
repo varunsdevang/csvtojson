@@ -1,0 +1,6 @@
+{
+    "httpHost" : "localhost",
+    "httpPort": "3030",
+    "hideBanner": true,
+    "appName": "CSV To JSON"
+}
