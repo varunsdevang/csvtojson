@@ -23,26 +23,26 @@ var (
 
 type CsvToJsonConverter struct{}
 
-func (c *CsvToJsonConverter) CsvToJson(reader io.Reader) ([]interface{}, string, error) {
+func (c *CsvToJsonConverter) CsvToJson(reader io.Reader) ([]map[string]string, string, error) {
 	log.Info("In CsvToJson...")
-	resp := []interface{}{}
+	resp := []map[string]string{}
 
 	csvReader := csv.NewReader(reader)
 	csvReader.TrimLeadingSpace = true
 	header, err := csvReader.Read()
 	if err != nil {
-		return []interface{}{}, err.Error(), ErrorInvalidHeader
+		return resp, err.Error(), ErrorInvalidHeader
 	}
 
 	records, err := csvReader.ReadAll()
 	if err != nil {
 		cerr := err.(*csv.ParseError)
-		return []interface{}{}, fmt.Sprintf("error in line %d column %d, error: %s", cerr.Line, cerr.Column, cerr.Err.Error()), ErrorInvalidRow
+		return resp, fmt.Sprintf("error in line %d column %d, error: %s", cerr.Line, cerr.Column, cerr.Err.Error()), ErrorInvalidRow
 	}
 
 	noOfRoutines := math.Min(maxNumberOfRoutines, float64((len(records))))
 	in := make(chan []string, len(records))
-	out := make(chan interface{})
+	out := make(chan map[string]string)
 	wg := sync.WaitGroup{}
 	wg.Add(int(noOfRoutines))
 
@@ -77,7 +77,7 @@ func (c *CsvToJsonConverter) CsvToJson(reader io.Reader) ([]interface{}, string,
 	return resp, "", nil
 }
 
-func csvToJsonWorker(header, record []string, output chan interface{}) {
+func csvToJsonWorker(header, record []string, output chan map[string]string) {
 	m := make(map[string]string)
 	for i, f := range record {
 		m[header[i]] = f

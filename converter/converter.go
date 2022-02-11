@@ -3,5 +3,5 @@ package converter
 import "io"
 
 type Converter interface {
-	CsvToJson(io.Reader) ([]interface{}, string, error)
+	CsvToJson(io.Reader) ([]map[string]string, string, error)
 }

@@ -9,6 +9,7 @@ import (
 )
 
 type (
+	//
 	ConverterController struct {
 		Converter converter.Converter
 	}
@@ -22,6 +23,15 @@ func NewConverterController() *ConverterController {
 	return &ConverterController{Converter: &converter.CsvToJsonConverter{}}
 }
 
+// CsvToJsonHandler
+// @Summary      handler for csv to json conversion
+// @Description  generates json array for provided csv file
+// @Accept       mpfd
+// @Produce      json
+// @Success      200  {object}  []map[string]string
+// @Failure      400  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /csvtojson [post]
 func (c *ConverterController) CsvToJsonHandler(cxt echo.Context) error {
 	err := cxt.Request().ParseMultipartForm(1024 * 1024)
 	if err != nil {
@@ -43,8 +53,18 @@ func (c *ConverterController) CsvToJsonHandler(cxt echo.Context) error {
 	if err != nil {
 		log.Error("error : ", err)
 		log.Error("message : ", errMsg)
-		return cxt.NoContent(http.StatusInternalServerError)
+		return cxt.JSON(c.errToHTTPCode(err), ErrorResponse{Message: errMsg})
 	}
 
 	return cxt.JSON(http.StatusOK, output)
+}
+
+func (c *ConverterController) errToHTTPCode(err error) int {
+	switch err {
+	case converter.ErrorInvalidHeader,
+		converter.ErrorInvalidRow:
+		return http.StatusBadRequest
+	default:
+		return http.StatusInternalServerError
+	}
 }
